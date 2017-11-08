@@ -57,19 +57,19 @@ public class Main {
         service = retrofit.create(RetrofitCall.class);
         ObjectMapper objectMapper = new ObjectMapper();
 
-//        scrapeMedium(service, objectMapper);
+        scrapeMedium(service, objectMapper);
 
         getListOfPosts(service, objectMapper, "1507305601019", "9d34e48ecf94", true);
+
+        countDownLatch.await();
     }
 
     private static void scrapeMedium(RetrofitCall service, ObjectMapper objectMapper) throws IOException, InterruptedException {
-
 
         FileUtils.write(allPostFile, "[", true);
         getListOfTopics(Main.service, objectMapper);
         topicIds.forEach(s -> getListOfPosts(Main.service, objectMapper, "1507305601019", s, false));
 
-        countDownLatch.await();
     }
 
     private static void getData(RetrofitCall service, ObjectMapper objectMapper, List<String> postIds, String topicId, File file) {

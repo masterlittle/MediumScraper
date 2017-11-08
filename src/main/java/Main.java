@@ -70,7 +70,7 @@ public class Main {
     private static void getData(RetrofitCall service, ObjectMapper objectMapper, List<String> postIds, String topicId) {
 
         Observable.from(postIds)
-                .delay(2, TimeUnit.SECONDS)
+                .delay(1, TimeUnit.SECONDS)
                 .onBackpressureBuffer()
                 .flatMap(id1 -> service.getPostData(id1)
                         .map(postResponse -> {
@@ -182,6 +182,7 @@ public class Main {
             return;
 
         Observable.just(topicId)
+                .delay(1, TimeUnit.SECONDS)
                 .flatMap(id -> service.getPostIds(id, LIMIT, time)
                         .onBackpressureBuffer()
                         .flatMap(responseBody -> {

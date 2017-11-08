@@ -182,7 +182,6 @@ public class Main {
             return;
 
         Observable.just(topicId)
-                .delay(1, TimeUnit.SECONDS)
                 .flatMap(id -> service.getPostIds(id, LIMIT, time)
                         .onBackpressureBuffer()
                         .flatMap(responseBody -> {

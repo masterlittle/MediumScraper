@@ -11,9 +11,8 @@ import java.util.List;
  */
 public class ReadPosts {
 
-    public void readPosts(){
+    public void readPosts(File file){
         ObjectMapper objectMapper = new ObjectMapper();
-        File file = new File("medium-posts.json");
         try {
             String posts = FileUtils.readFileToString(file);
             String jsonPosts = posts.substring(0, posts.length()-1) + "]";

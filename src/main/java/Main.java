@@ -68,6 +68,8 @@ public class Main {
     private static void scrapeMedium(RetrofitCall service, ObjectMapper objectMapper) throws IOException, InterruptedException {
 
         FileUtils.write(allPostFile, "[", true);
+        FileUtils.write(popularPostFile, "[", true);
+
         getListOfTopics(Main.service, objectMapper);
         topicIds.forEach(s -> getListOfPosts(Main.service, objectMapper, "1507305601019", s, false, hashOfPosts));
 

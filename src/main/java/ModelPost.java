@@ -43,6 +43,6 @@ public class ModelPost {
     }
 
     private String stringWithDelimiter(String s){
-        return s + delimiter();
+        return s.replace("\"", "\\\"") + delimiter();
     }
 }

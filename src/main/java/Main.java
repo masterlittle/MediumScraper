@@ -135,6 +135,8 @@ public class Main {
                         try {
                             count.incrementAndGet();
                             System.out.println("Size of posts till now is " + count.get());
+
+                            System.out.println("Topic: " + modelPost.getTopicId());
                             String json = objectMapper.writeValueAsString(modelPost);
                             FileUtils.write(file, json + ",", true);
                         } catch (IOException e) {
@@ -239,7 +241,8 @@ public class Main {
                     public void onNext(ModelPostWithPaging modelPostWithPaging) {
                         totalPostCount.addAndGet(modelPostWithPaging.getPostIds().size());
                         System.out.println("Topics-- Size of total posts till now is " + totalPostCount.get());
-                        System.out.println("Topic: " + modelPostWithPaging.getTopicId());
+                        System.out.println();
+                        System.out.println("----------------------------------------------------------------");
 
                         if (isPopular) {
                             getData(service, objectMapper, modelPostWithPaging.getPostIds(), modelPostWithPaging.getTopicId(), popularPostFile);

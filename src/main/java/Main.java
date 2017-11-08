@@ -33,6 +33,7 @@ public class Main {
     private static RetrofitCall service;
     private static List<String> topicIds;
     private static HashSet<String> hashOfPosts = new HashSet<>();
+    private static HashSet<String> hashOfPopularPosts = new HashSet<>();
     private static File allPostFile = new File("medium-posts.json");
     private static File popularPostFile = new File("medium-posts-popular.json");
     private static AtomicInteger count = new AtomicInteger(0);
@@ -59,7 +60,7 @@ public class Main {
 
         scrapeMedium(service, objectMapper);
 
-        getListOfPosts(service, objectMapper, "1507305601019", "9d34e48ecf94", true);
+        getListOfPosts(service, objectMapper, "1507305601019", "9d34e48ecf94", true, hashOfPopularPosts);
 
         countDownLatch.await();
     }
@@ -68,7 +69,7 @@ public class Main {
 
         FileUtils.write(allPostFile, "[", true);
         getListOfTopics(Main.service, objectMapper);
-        topicIds.forEach(s -> getListOfPosts(Main.service, objectMapper, "1507305601019", s, false));
+        topicIds.forEach(s -> getListOfPosts(Main.service, objectMapper, "1507305601019", s, false, hashOfPosts));
 
     }
 
@@ -180,7 +181,7 @@ public class Main {
                 });
     }
 
-    private static void getListOfPosts(RetrofitCall service, ObjectMapper objectMapper, String time, String topicId, boolean isPopular) {
+    private static void getListOfPosts(RetrofitCall service, ObjectMapper objectMapper, String time, String topicId, boolean isPopular, HashSet<String> hashSet) {
 
         if (Objects.equals(time, ""))
             return;
@@ -196,8 +197,8 @@ public class Main {
                                         .flatMap(streamItem -> Observable.from(streamItem.getSection().getItems())
                                                 .map(item -> {
                                                     String post = item.getPost().getPostId();
-                                                    if (!hashOfPosts.contains(post)) {
-                                                        hashOfPosts.add(post);
+                                                    if (!hashSet.contains(post)) {
+                                                        hashSet.add(post);
                                                         return post;
                                                     }
                                                     else
@@ -248,10 +249,10 @@ public class Main {
 
                         if (isPopular) {
                             getData(service, objectMapper, modelPostWithPaging.getPostIds(), modelPostWithPaging.getTopicId(), popularPostFile);
-                            getListOfPosts(service, objectMapper, modelPostWithPaging.getTime(), modelPostWithPaging.getTopicId(), true);
+                            getListOfPosts(service, objectMapper, modelPostWithPaging.getTime(), modelPostWithPaging.getTopicId(), true, hashOfPopularPosts);
                         } else {
                             getData(service, objectMapper, modelPostWithPaging.getPostIds(), modelPostWithPaging.getTopicId(), allPostFile);
-                            getListOfPosts(service, objectMapper, modelPostWithPaging.getTime(), modelPostWithPaging.getTopicId(), false);
+                            getListOfPosts(service, objectMapper, modelPostWithPaging.getTime(), modelPostWithPaging.getTopicId(), false, hashOfPosts);
                         }
                     }
                 });

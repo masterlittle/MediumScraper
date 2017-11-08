@@ -2,6 +2,7 @@ group 'medium'
 version '1.0-SNAPSHOT'
 
 apply plugin: 'java'
+apply plugin: 'application'
 
 sourceCompatibility = 1.8
 
@@ -62,6 +63,8 @@ dependencies {
     compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.6.2'
 
 }
+
+mainClassName='Main'
 version = '1.0'
 
 //create a single Jar with all dependencies
@@ -74,4 +77,10 @@ task fatJar(type: Jar) {
     baseName = project.name + '-all'
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'Main'
+    }
 }

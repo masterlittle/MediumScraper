@@ -33,7 +33,8 @@ public class Main {
     private static RetrofitCall service;
     private static List<String> topicIds;
     private static HashSet<String> hashOfPosts = new HashSet<>();
-    private static File file = new File("medium-posts.json");
+    private static File allPostFile = new File("medium-posts.json");
+    private static File popularPostFile = new File("medium-posts-popular.json");
     private static AtomicInteger count = new AtomicInteger(0);
     private static AtomicInteger totalPostCount = new AtomicInteger(0);
 
@@ -41,11 +42,7 @@ public class Main {
 
 //        ReadPosts readPosts = new ReadPosts();
 //        readPosts.readPosts();
-        scrapeMedium();
 
-    }
-
-    private static void scrapeMedium() throws IOException, InterruptedException {
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
         interceptor.setLevel(HttpLoggingInterceptor.Level.BASIC);
         OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
@@ -60,14 +57,22 @@ public class Main {
         service = retrofit.create(RetrofitCall.class);
         ObjectMapper objectMapper = new ObjectMapper();
 
-        FileUtils.write(file, "[", true);
-        getListOfTopics(service, objectMapper);
-        topicIds.forEach(s -> getListOfPosts(service, objectMapper, "1507305601019", s));
+//        scrapeMedium(service, objectMapper);
+
+        getListOfPosts(service, objectMapper, "1507305601019", "9d34e48ecf94", true);
+    }
+
+    private static void scrapeMedium(RetrofitCall service, ObjectMapper objectMapper) throws IOException, InterruptedException {
+
+
+        FileUtils.write(allPostFile, "[", true);
+        getListOfTopics(Main.service, objectMapper);
+        topicIds.forEach(s -> getListOfPosts(Main.service, objectMapper, "1507305601019", s, false));
 
         countDownLatch.await();
     }
 
-    private static void getData(RetrofitCall service, ObjectMapper objectMapper, List<String> postIds, String topicId) {
+    private static void getData(RetrofitCall service, ObjectMapper objectMapper, List<String> postIds, String topicId, File file) {
 
         Observable.from(postIds)
                 .delay(1, TimeUnit.SECONDS)
@@ -161,12 +166,7 @@ public class Main {
 
                     @Override
                     public void onError(Throwable e) {
-
-                        try {
-                            throw e;
-                        } catch (Throwable throwable) {
-                            throwable.printStackTrace();
-                        }
+                        System.out.println(e.getMessage());
                     }
 
                     @Override
@@ -176,7 +176,7 @@ public class Main {
                 });
     }
 
-    private static void getListOfPosts(RetrofitCall service, ObjectMapper objectMapper, String time, String topicId) {
+    private static void getListOfPosts(RetrofitCall service, ObjectMapper objectMapper, String time, String topicId, boolean isPopular) {
 
         if (Objects.equals(time, ""))
             return;
@@ -232,21 +232,22 @@ public class Main {
 
                     @Override
                     public void onError(Throwable e) {
-                        try {
-                            throw e;
-                        } catch (Throwable throwable) {
-                            throwable.printStackTrace();
-                        }
+                        System.out.println(e.getMessage());
                     }
 
                     @Override
                     public void onNext(ModelPostWithPaging modelPostWithPaging) {
                         totalPostCount.addAndGet(modelPostWithPaging.getPostIds().size());
                         System.out.println("Topics-- Size of total posts till now is " + totalPostCount.get());
-
                         System.out.println("Topic: " + modelPostWithPaging.getTopicId());
-                        getData(service, objectMapper, modelPostWithPaging.getPostIds(), modelPostWithPaging.getTopicId());
-                        getListOfPosts(service, objectMapper, modelPostWithPaging.getTime(), modelPostWithPaging.getTopicId());
+
+                        if (isPopular) {
+                            getData(service, objectMapper, modelPostWithPaging.getPostIds(), modelPostWithPaging.getTopicId(), popularPostFile);
+                            getListOfPosts(service, objectMapper, modelPostWithPaging.getTime(), modelPostWithPaging.getTopicId(), true);
+                        } else {
+                            getData(service, objectMapper, modelPostWithPaging.getPostIds(), modelPostWithPaging.getTopicId(), allPostFile);
+                            getListOfPosts(service, objectMapper, modelPostWithPaging.getTime(), modelPostWithPaging.getTopicId(), false);
+                        }
                     }
                 });
     }

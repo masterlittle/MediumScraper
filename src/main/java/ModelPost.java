@@ -1,7 +1,4 @@
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 
 /**
  * Created by grofers on 07/11/17.
@@ -9,6 +6,7 @@ import lombok.ToString;
 @Builder
 @Getter
 @EqualsAndHashCode
+@AllArgsConstructor
 public class ModelPost {
 
     String postId;

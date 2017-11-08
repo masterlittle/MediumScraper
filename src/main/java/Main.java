@@ -42,7 +42,7 @@ public class Main {
     public static void main(String args[]) throws InterruptedException, IOException {
 
 //        ReadPosts readPosts = new ReadPosts();
-//        readPosts.readPosts();
+//        readPosts.readPosts(new File("medium-posts.json"));
 
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
         interceptor.setLevel(HttpLoggingInterceptor.Level.BASIC);

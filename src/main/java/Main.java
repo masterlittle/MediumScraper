@@ -134,6 +134,8 @@ public class Main {
                     public void onNext(ModelPost modelPost) {
                         try {
                             count.incrementAndGet();
+                            System.out.println("Expected posts: "+ totalPostCount.get());
+                            System.out.println();
                             System.out.println("Size of posts till now is " + count.get());
 
                             System.out.println("Topic: " + modelPost.getTopicId());
